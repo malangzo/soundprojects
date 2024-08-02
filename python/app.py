@@ -25,6 +25,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 연결 확인
+@app.get("/")
+async def root():
+    return {"message": "연결 성공"}
+
 # 전체 소음 데이터 조회
 @app.get("/getNoiseData")
 async def get_noise_data():
@@ -37,8 +42,8 @@ async def get_noise_data():
             decibel = data["decibel"]
             timemap = data["timemap"]
             lat = float(timemap[:10])
-            lon = float(timemap[10:21])
-            if label != "silence":
+            lon = float(timemap[10:20])
+            if (label != "silence") and (label != "speech"):
                 result.append({
                     "location": {
                         "lat": lat,
@@ -65,7 +70,7 @@ async def get_noise_data_week():
             timemap = data["timemap"]
             lat = float(timemap[:10])
             lon = float(timemap[10:21])
-            if label != "silence":
+            if (label != "silence") and (label != "speech"):
                 result.append({
                     "location": {
                         "lat": lat,
@@ -92,7 +97,7 @@ async def get_noise_data_one_day():
             timemap = data["timemap"]
             lat = float(timemap[:10])
             lon = float(timemap[10:21])
-            if label != "silence":
+            if (label != "silence") and (label != "speech"):
                 result.append({
                     "location": {
                         "lat": lat,
@@ -105,4 +110,7 @@ async def get_noise_data_one_day():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5200)
